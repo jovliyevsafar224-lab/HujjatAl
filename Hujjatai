@@ -1,0 +1,202 @@
+
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HujjatAI — Aqlli hujjatlar platformasi</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;font-family:Arial,sans-serif}
+body{background:#f4f6fb;color:#182033}
+header{background:#111a30;color:white;padding:18px 7%;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:15px}
+.logo{font-size:25px;font-weight:800;color:#65e5bc}
+nav a{color:white;text-decoration:none;margin-left:20px;font-size:14px}
+.hero{background:linear-gradient(130deg,#111a30,#24466a);color:white;padding:65px 20px;text-align:center}
+.hero h1{font-size:38px;margin-bottom:15px}
+.hero p{color:#d4dfed;line-height:1.6}
+.container{max-width:1100px;margin:auto;padding:35px 20px}
+h2{margin-bottom:20px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(145px,1fr));gap:15px}
+.item{background:white;padding:23px 12px;border-radius:13px;text-align:center;cursor:pointer;border:2px solid transparent;box-shadow:0 4px 15px #00000008}
+.item.active,.item:hover{border-color:#13b98c;background:#effff9}
+.item span{display:block;font-size:30px;margin-bottom:12px}
+.generator{background:white;margin-top:35px;padding:25px;border-radius:15px;box-shadow:0 4px 20px #00000009}
+label{display:block;font-weight:bold;margin:17px 0 8px}
+input,select,textarea{width:100%;padding:14px;border:1px solid #dce1ea;border-radius:8px;font-size:15px;outline:none}
+textarea{min-height:100px;resize:vertical}
+button{background:#10ad83;color:white;border:none;padding:14px 20px;border-radius:8px;font-weight:bold;cursor:pointer}
+button:hover{background:#078b68}
+.generate{width:100%;margin-top:20px}
+.result{display:none;background:white;margin-top:25px;padding:25px;border-radius:15px}
+#output{white-space:pre-wrap;line-height:1.8;margin:20px 0;color:#333}
+.actions{display:flex;gap:10px;flex-wrap:wrap}
+.secondary{background:#263b59}
+footer{margin-top:45px;background:#111a30;color:#ccd3df;text-align:center;padding:30px}
+@media(max-width:600px){.hero h1{font-size:28px}nav a{margin-left:8px;font-size:12px}}
+</style>
+</head>
+<body>
+
+<header>
+ <div class="logo">HujjatAI ✦</div>
+ <nav>
+  <a href="#">Bosh sahifa</a>
+  <a href="#types">Hujjatlar</a>
+  <a href="#create">Yaratish</a>
+ </nav>
+</header>
+
+<section class="hero">
+ <h1>Hujjatlaringizni AI bilan yarating</h1>
+ <p>Referat, kurs ishi, maqola va boshqa hujjatlarni bir joyda tayyorlang.</p>
+</section>
+
+<main class="container">
+ <section id="types">
+  <h2>Hujjat turini tanlang</h2>
+  <div class="grid">
+   <div class="item active" onclick="choose(this,'Referat')"><span>📚</span>Referat</div>
+   <div class="item" onclick="choose(this,'Kurs ishi')"><span>🎓</span>Kurs ishi</div>
+   <div class="item" onclick="choose(this,'Mustaqil ish')"><span>📝</span>Mustaqil ish</div>
+   <div class="item" onclick="choose(this,'Ilmiy maqola')"><span>🔬</span>Ilmiy maqola</div>
+   <div class="item" onclick="choose(this,'Taqdimot')"><span>📊</span>Taqdimot</div>
+   <div class="item" onclick="choose(this,'Ariza')"><span>📄</span>Ariza</div>
+   <div class="item" onclick="choose(this,'Tarjimai hol')"><span>👤</span>Tarjimai hol</div>
+   <div class="item" onclick="choose(this,'Dars ishlanma')"><span>📖</span>Dars ishlanma</div>
+  </div>
+ </section>
+
+ <section class="generator" id="create">
+  <h2>Hujjat yaratish</h2>
+
+  <label>Tanlangan hujjat</label>
+  <input id="type" value="Referat" readonly>
+
+  <label>Mavzu nomi</label>
+  <input id="topic" placeholder="Masalan: O‘zbek tilining taraqqiyot bosqichlari">
+
+  <label>Fan yoki yo‘nalish</label>
+  <input id="subject" placeholder="Masalan: O‘zbek tili va adabiyoti">
+
+  <label>Muallif</label>
+  <input id="author" placeholder="Ism-familiyangiz">
+
+  <label>Hajmi</label>
+  <select id="pages">
+   <option value="3">3 bet</option>
+   <option value="5">5 bet</option>
+   <option value="10">10 bet</option>
+   <option value="15">15 bet</option>
+   <option value="20">20 bet</option>
+  </select>
+
+  <button class="generate" onclick="generateDocument()">✦ Hujjat yaratish</button>
+ </section>
+
+ <section class="result" id="result">
+  <h2>Hujjat natijasi</h2>
+  <div id="output"></div>
+  <div class="actions">
+   <button onclick="copyText()">Nusxalash</button>
+   <button class="secondary" onclick="downloadText()">TXT yuklab olish</button>
+  </div>
+ </section>
+</main>
+
+<footer>
+ <h2>HujjatAI</h2>
+ <p>Hujjat tayyorlashning yangi avlodi.</p>
+ <p style="margin-top:12px">© 2026 HujjatAI</p>
+</footer>
+
+<script>
+let selectedType="Referat";
+
+function choose(element,type){
+ document.querySelectorAll(".item").forEach(x=>x.classList.remove("active"));
+ element.classList.add("active");
+ selectedType=type;
+ document.getElementById("type").value=type;
+}
+
+function generateDocument(){
+ const topic=document.getElementById("topic").value.trim();
+ const subject=document.getElementById("subject").value.trim();
+ const author=document.getElementById("author").value.trim();
+ const pages=document.getElementById("pages").value;
+
+ if(!topic){
+  alert("Iltimos, mavzuni kiriting!");
+  return;
+ }
+
+ let text=
+`${selectedType.toUpperCase()}
+
+Mavzu: ${topic}
+Fan: ${subject || "Ko‘rsatilmagan"}
+Muallif: ${author || "Ko‘rsatilmagan"}
+
+REJA:
+
+1. Kirish
+2. ${topic} haqida umumiy ma'lumot
+3. Mavzuning asosiy jihatlari
+4. Tahlil va muhokama
+5. Xulosa
+6. Foydalanilgan adabiyotlar
+
+KIRISH
+
+${topic} mavzusi bugungi kunda muhim ilmiy va amaliy ahamiyatga ega. Ushbu ishning asosiy maqsadi mavzuni o‘rganish, uning mazmunini yoritish hamda asosiy jihatlarini tahlil qilishdan iborat.
+
+ASOSIY QISM
+
+1. ${topic} haqida umumiy ma'lumot
+
+${topic} mavzusini o‘rganish jarayonida uning kelib chiqishi, rivojlanishi va asosiy xususiyatlariga e'tibor qaratish lozim. Bu yo‘nalish tegishli fan doirasida muhim o‘rin egallaydi.
+
+2. Mavzuning asosiy jihatlari
+
+Mavzuning mazmunini chuqur o‘rganish nazariy bilimlarni mustahkamlashga yordam beradi. Shuningdek, mavjud qarashlar va ilmiy manbalarni tahlil qilish muhim hisoblanadi.
+
+3. Tahlil va muhokama
+
+O‘rganilayotgan masalaning nazariy va amaliy tomonlarini taqqoslash orqali uning ahamiyatini yaxshiroq tushunish mumkin.
+
+XULOSA
+
+Xulosa qilib aytganda, ${topic} mavzusi muhim ilmiy ahamiyatga ega. Ushbu ish davomida mavzuning asosiy jihatlari ko‘rib chiqildi va umumiy xulosalar shakllantirildi.
+
+FOYDALANILGAN ADABIYOTLAR
+
+1. Tegishli fan bo‘yicha darslik.
+2. Ilmiy maqolalar va o‘quv qo‘llanmalar.
+3. Mavzuga oid ilmiy manbalar.
+
+Hajm talabi: ${pages} bet.`;
+
+ document.getElementById("output").textContent=text;
+ document.getElementById("result").style.display="block";
+ document.getElementById("result").scrollIntoView({behavior:"smooth"});
+}
+
+function copyText(){
+ navigator.clipboard.writeText(document.getElementById("output").textContent)
+ .then(()=>alert("Matn nusxalandi!"))
+ .catch(()=>alert("Nusxalash amalga oshmadi."));
+}
+
+function downloadText(){
+ const text=document.getElementById("output").textContent;
+ const blob=new Blob([text],{type:"text/plain;charset=utf-8"});
+ const url=URL.createObjectURL(blob);
+ const a=document.createElement("a");
+ a.href=url;
+ a.download="HujjatAI.txt";
+ a.click();
+ URL.revokeObjectURL(url);
+}
+</script>
+</body>
+</html>
